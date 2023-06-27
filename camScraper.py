@@ -126,17 +126,17 @@ class camScraper:
         cam_grid = cam_preview.find_element_by_class_name('cameras-grid')
         cam_previews = cam_grid.find_elements_by_tag_name('app-camera-view')
         if len(cam_previews)==1:
-            print("Only one camera.")
+            #print("Only one camera.")
             img_address = cam_preview.text.split("\n")[0]
-            print(img_address)
+            #print(img_address)
             
             cam_n_preview = cam_previews[0]
             imgs = cam_n_preview.find_elements_by_tag_name('img')
             cam_img = [i for i in imgs if 'watermark' not in i.get_attribute('class')][0]
             #Folder Structure
-            scraper.img_add_folder(img_address)
+            self.img_add_folder(img_address)
             #Save
-            scraper.save_image(cam_img)
+            self.save_image(cam_img)
             os.chdir(img_dir)
         else:
             for cam_n_preview in cam_previews:
@@ -198,7 +198,7 @@ class camScraper:
         for scrape_set in range(self.iterations):
             page_n = (self.last_row_scraped // self.results_pp)
             driver.refresh()
-            time.sleep(3)
+            time.sleep(4)
             self.set_results_pp() #this can crash occassionally when "another element obscures it...."
             for i in range(page_n):
                 self.click_next_page()
