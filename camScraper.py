@@ -13,7 +13,6 @@ import re
 
 #For Image Plots
 import matplotlib.image as im
-%matplotlib inline
 import matplotlib.pyplot as plt
 
 #File Org
