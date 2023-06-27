@@ -19,5 +19,5 @@ If you wish to add this environment to your jupyter notebook instance you must a
 pip install ipykernel
 python -m ipykernel install --user --name=NYC_Cam_Venv
 `
-
+ 
 From there you should now be able to select the "NYC_Cam_Venv" (you may use an alternative name if you wish) available under the kernels in your jupyter notebook instance (you may need to refresh the page first.)
