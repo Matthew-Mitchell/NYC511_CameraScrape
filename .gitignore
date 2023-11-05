@@ -1,2 +1,6 @@
 .ipynb_checkpoints**
 geckodriver*
+*.csv
+*.pdf
+__pycache__**
+images**
