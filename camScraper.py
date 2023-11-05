@@ -328,8 +328,8 @@ class camScraper:
 
 
 if __name__ == '__main__':
-    print("In development. Will eventually run from command line....")
-    scraper = camScraper(headless=False, iterations=300)
+    ##To Do: Add argparse
+    scraper = camScraper(headless=True, iterations=300)
 
     #Update Gecko Driver Path for Ubuntu Desktop
     if sys.platform == 'linux':

@@ -76,6 +76,15 @@ def image_scrape_summary(to_print=True, autosave=True, save_snapshot_cadence='da
         print("Additional files since last snapshot: {}".format(n_new_images))
         byte_size = df['total_size_in_bytes'].sum()
         print("Total Size On Disk: {}".format(format_byte_size(byte_size)))
+
+        ncameras = len(df)
+        ncameras_data_today = len(df[df.nimages_today > 0])
+        msg = "Number of cameras with data today: {ntoday} of {tot} ({percent:.2%})"
+        print(msg.format(ntoday = ncameras_data_today,
+                         tot = ncameras,
+                         percent = round(ncameras_data_today/ncameras,2)
+                        )
+             )
     if autosave:
         #Potential add on: Detect Existing Image File Snapshots
         if to_print:
