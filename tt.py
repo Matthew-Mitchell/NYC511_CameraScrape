@@ -6,9 +6,25 @@ import datetime
 from collections import Counter
 import re
 
+def format_byte_size(byte_size):
+    kb = float(2**10)
+    mb = kb**2
+    gb = kb**3
+    #Under 0.1KB
+    if byte_size < 0.1*kb:
+        return "{} bytes".format(byte_size)
+    elif byte_size < 0.1*mb:
+        return "{} kb".format(round(byte_size/kb,2))
+    elif byte_size < 0.5*gb:
+        return "{} mb".format(round(byte_size/mb,2))
+    else:
+        return "{} gb".format(round(byte_size/gb,2))
+
 def extract_filetime(filename):
     try:
-        date_str = re.findall(".*?(\d){2}-(\d){2}-(\d){4}\.csv",x)[0]
+        base_filename = "NYC_511_ImageScrape_File_Summary_as_of_"
+        pattern = "{base_filename}(\d\d-\d\d-\d\d\d\d)[.]csv".format(base_filename=base_filename)
+        date_str = re.findall(pattern,filename)[0]
         return pd.to_datetime(date_str)
     except:
         return None
@@ -26,6 +42,7 @@ def image_scrape_summary(to_print=True, autosave=True, save_snapshot_cadence='da
         subfiles = glob.glob("{}/*".format(folder))
         if len(subfiles) > 0:
             subfile_timestamps = [pd.to_datetime(time.ctime(os.path.getmtime(subfile))) for subfile in subfiles]
+            subfile_sizes = [os.path.getsize(subfile) for subfile in subfiles]
             monthly_summaries = dict(Counter([x.strftime("%B %Y") for x in subfile_timestamps]))
             nimages_today = len([x for x in subfile_timestamps if x>today])
             nimages_last_week = len([x for x in subfile_timestamps if x>last_week])
@@ -34,7 +51,8 @@ def image_scrape_summary(to_print=True, autosave=True, save_snapshot_cadence='da
                        'max': max(subfile_timestamps),
                        'count' : len(subfile_timestamps),
                        'nimages_today': nimages_today,
-                       'nimages_last_week' : nimages_last_week
+                       'nimages_last_week' : nimages_last_week,
+                       'total_size_in_bytes' : sum(subfile_sizes)
                       }
             summary = {**summary, **monthly_summaries}
             
@@ -56,6 +74,8 @@ def image_scrape_summary(to_print=True, autosave=True, save_snapshot_cadence='da
         previous_total = pd.read_csv(last_file, usecols=['count']).sum()
         n_new_images = n_images - previous_total
         print("Additional files since last snapshot: {}".format(n_new_images))
+        byte_size = df['total_size_in_bytes'].sum()
+        print("Total Size On Disk: {}".format(format_byte_size(byte_size)))
     if autosave:
         #Potential add on: Detect Existing Image File Snapshots
         if to_print:
