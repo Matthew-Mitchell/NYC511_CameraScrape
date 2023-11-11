@@ -29,6 +29,29 @@ def extract_filetime(filename):
     except:
         return None
 
+def cam_subset_summary(subset_ncameras, description, tot=906):
+    msg = "Number of cameras with data in past {description}: {nsubset} of {tot} ({percent:.2%})"
+    msg = msg.format(description=description,
+                     nsubset = subset_ncameras,
+                 tot = tot,
+                 percent = round(subset_ncameras/tot,2)
+                )
+    return msg
+
+def print_cam_summary_past_nminutes(n, df, description='{} minutes'):
+    ncameras_past_minute = len(df[(df['time_since_last_scrape'].dt.seconds / 60) <= n])
+    if n >= 60:
+        if n % 60 == 0:
+            n = int(n/60)
+        else:
+            n = round(n/60,1)
+        description='{} hours'
+    description = description.format(n)
+    if n == 1:
+         description = description.strip('s')
+    summary = cam_subset_summary(ncameras_past_minute, description)
+    print(summary)
+
 def image_scrape_summary(to_print=True, autosave=True, save_snapshot_cadence='daily'):
     now = datetime.datetime.now()
     today = pd.to_datetime((now).strftime("%Y-%m-%d"))
@@ -68,10 +91,10 @@ def image_scrape_summary(to_print=True, autosave=True, save_snapshot_cadence='da
         last_file = previous_snapshots[-1]
     if to_print:
         n_images = df['count'].sum()
-        print("Total Files: {}".format(n_images))
-        print("Images scraped today: {}".format(df['nimages_today'].sum()))
-        print("Images scraped in the last week: {}".format(df['nimages_last_week'].sum()))
-        previous_total = pd.read_csv(last_file, usecols=['count']).sum()
+        print("Total Files: {:,}".format(n_images))
+        print("Images scraped today: {:,}".format(df['nimages_today'].sum()))
+        print("Images scraped in the last week: {:,}".format(df['nimages_last_week'].sum()))
+        previous_total = pd.read_csv(last_file, usecols=['count'])['count'].sum()
         n_new_images = n_images - previous_total
         print("Additional files since last snapshot: {}".format(n_new_images))
         byte_size = df['total_size_in_bytes'].sum()
@@ -102,3 +125,7 @@ def image_scrape_summary(to_print=True, autosave=True, save_snapshot_cadence='da
             if to_print:
                     print("Saving to: {}".format(filename))
     return df
+
+
+if __name__ == "__main__":
+    image_scrape_summary()
