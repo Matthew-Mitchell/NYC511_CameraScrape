@@ -123,7 +123,7 @@ class camScraper:
             #https://stackoverflow.com/questions/76428561/typeerror-webdriver-init-got-multiple-values-for-argument-options
             service = Service(executable_path="/home/matt/Documents/Projects/rpa_recording/chromedriver-linux64/chromedriver") #Updated Selenium 4.1
             chromedriver_path = "/home/matt/Documents/Projects/rpa_recording/chromedriver-linux64/chromedriver"
-            self.driver = webdriver.Chrome()#options=chromeOptions, service=service)  #Updated selenium 4.1
+            self.driver = webdriver.Chrome(options=chromeOptions)#, service=service)  #Updated selenium 4.1
 
         else:
             self.driver = webdriver.Firefox(executable_path=self.geckoDriverPath)
@@ -329,7 +329,7 @@ class camScraper:
 
 if __name__ == '__main__':
     ##To Do: Add argparse
-    scraper = camScraper(headless=True, iterations=300)
+    scraper = camScraper(headless=True, iterations=5*10**3)
 
     #Update Gecko Driver Path for Ubuntu Desktop
     if sys.platform == 'linux':

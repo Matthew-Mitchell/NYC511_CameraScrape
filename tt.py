@@ -38,6 +38,14 @@ def cam_subset_summary(subset_ncameras, description, tot=906):
                 )
     return msg
 
+def get_user_input(prompt, valid_entries):
+    response = input(prompt)
+    if response in valid_entries:
+        return response
+    else:
+        print("Invalid response. Please reselect.")
+        return get_user_input(prompt=prompt, valid_entries=valid_entries)
+
 def print_cam_summary_past_nminutes(n, df, description='{} minutes'):
     ncameras_past_minute = len(df[(df['time_since_last_scrape'].dt.seconds / 60) <= n])
     if n >= 60:
@@ -52,7 +60,7 @@ def print_cam_summary_past_nminutes(n, df, description='{} minutes'):
     summary = cam_subset_summary(ncameras_past_minute, description)
     print(summary)
 
-def image_scrape_summary(to_print=True, autosave=True, save_snapshot_cadence='daily'):
+def image_scrape_summary(to_print=True, autosave=True, auto_overwrite=False, save_snapshot_cadence='daily'):
     now = datetime.datetime.now()
     today = pd.to_datetime((now).strftime("%Y-%m-%d"))
     #yesterday = today - pd.Timedelta(days=1)
@@ -115,11 +123,16 @@ def image_scrape_summary(to_print=True, autosave=True, save_snapshot_cadence='da
 
         filename = "NYC_511_ImageScrape_File_Summary_as_of_{}.csv".format(now.strftime("%m-%d-%Y"))
         if os.path.isfile(filename):
-            overwrite = input("File: {} already exists. Do you wish to overwrite? (Y/N)".format(filename))
-            if overwrite:
-                if to_print:
-                    print("Overwriting file. Saving to: {}".format(filename))
+            if auto_overwrite:
+                print("Overwriting file. Saving to: {}".format(filename))
                 df.to_csv(filename)
+            else:
+                msg = f"File: {filename} already exists. Do you wish to overwrite? (Y/N)"
+                overwrite = get_user_input(msg, ["Y","N"])
+                if overwrite=="Y":
+                    if to_print:
+                        print("Overwriting file. Saving to: {}".format(filename))
+                    df.to_csv(filename)
         else:
             df.to_csv(filename)
             if to_print:
